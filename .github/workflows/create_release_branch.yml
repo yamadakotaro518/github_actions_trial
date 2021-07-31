@@ -32,7 +32,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
-          hub pull-request -m "Github Actions からプルリクを出します" -b master -h $BRANCH_NAME -r $REVIEWERS -F- <<<"プルリクのdescriptionに値が入るかの確認です。
+          hub pull-request -m "Github Actions からプルリクを出します" -b master -h $BRANCH_NAME -r $REVIEWERS -F- <<<"THIS IS THE SUBJECT
+          THIS IS SECOND LINE OF SUBJECT
           
-          改行もちゃんと入るか確認します。"
+          This is the body.
+          This is the second line of body.
+          
+          This will all be body."
 
