@@ -9,9 +9,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: install hub
-        uses: geertvdc/setup-hub@v1.0.0
-
       - name: checkout marge branch
         uses: actions/checkout@v2
         with:
