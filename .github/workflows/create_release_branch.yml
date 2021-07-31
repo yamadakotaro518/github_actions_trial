@@ -20,7 +20,7 @@ jobs:
           TZ: 'Asia/Tokyo'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          DATE=`date +"%Y%m%d"`
+          DATE=`date +"%Y%m%d%H%M"`
           BRANCH_NAME="new-branch-$DATE"
           git checkout -b "$BRANCH_NAME"
           git push origin "$BRANCH_NAME"
@@ -32,5 +32,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
-          hub pull-request -m "Github Actions からプルリクを出します" -b master -h $BRANCH_NAME -r $REVIEWERS
+          hub pull-request -m "Github Actions からプルリクを出します" -b master -h $BRANCH_NAME -r $REVIEWERS -F- <<< "プルリクのdescriptionに値が入るかの確認です。
+          
+          改行もちゃんと入るか確認します。
+          "
 
