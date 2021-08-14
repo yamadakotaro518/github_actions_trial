@@ -22,7 +22,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
-          for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "kakunin"`; do
+          for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "sonnaburanchnai"`; do
 
             # マージ用ブランチを作成
             DATE=`date +"%Y%m%d_%H%M%S"`
