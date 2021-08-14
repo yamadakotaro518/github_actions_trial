@@ -33,13 +33,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
-          for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "master"`; do
-            RESULT=`hub pull-request -b ${BRANCH_FOR_PULL_REQUEST#origin/} -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
+          for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "kakunin"`; do
+            RESULTS+=(`hub pull-request -b ${BRANCH_FOR_PULL_REQUEST#origin/} -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
             developブランチ取り込み作業
 
             確認です。
-            "`
-            echo ::set-output name=url::$RESULT
+            "`)
+            echo ::set-output name=urls::${RESULTS[@]}
           done
 
       # メッセージを作成する
@@ -47,8 +47,9 @@ jobs:
         id: create_message
         env:
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
-          URL: ${{ steps.create_pull_request.outputs.url }}
+          URLS: ${{ steps.create_pull_request.outputs.urls }}
         run: |
+          echo ${URLS[@]}
           MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました $URL"
           echo ::set-output name=message::$MESSAGE
 
