@@ -37,6 +37,7 @@ jobs:
             確認です。
             "`)
             echo ::set-output name=urls::${RESULTS[@]}
+            echo ::set-output name=pull_request_created::'true'
           done
 
       # メッセージを作成する
@@ -45,7 +46,8 @@ jobs:
         env:
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
           URLS: ${{ steps.create_pull_request.outputs.urls }}
-        # if: ${{ env.URLS[0] != '' }}
+          PULL_REQUEST_CREATED: ${{ steps.create_pull_request.outputs.pull_request_created }}
+        if: ${{ env.PULL_REQUEST_CREATED == 'true' }}
         run: |
           echo ${URLS[@]}
           MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
