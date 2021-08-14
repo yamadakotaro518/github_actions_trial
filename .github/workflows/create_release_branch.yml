@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: branch check
+        run: echo `git branch -l`
+
       - name: checkout marge branch
         uses: actions/checkout@v2
         with:
