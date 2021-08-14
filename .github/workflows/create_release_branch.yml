@@ -20,8 +20,6 @@ jobs:
           TZ: 'Asia/Tokyo'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo `git branch -r`
-          git checkout develop
           DATE=`date +"%Y%m%d_%H%M"`
           BRANCH_NAME="new-branch-$DATE"
           git checkout -b "$BRANCH_NAME"
@@ -35,19 +33,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
-          RES=`git branch`
-          echo $RES
-          echo hogehoge
+          for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "master"`; do
+            RESULT=`hub pull-request -b ${BRANCH_FOR_PULL_REQUEST#origin/} -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
+            developブランチ取り込み作業
 
-          # for BRANCH_FOR_PULL_REQUEST in `git branch | grep "master"`; do
-          #   echo "$BRANCH_FOR_PULL_REQUEST"
-          #   RESULT=`hub pull-request -b $BRANCH_FOR_PULL_REQUEST -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
-          #   developブランチ取り込み作業
-
-          #   確認です。
-          #   "`
-          #   echo ::set-output name=url::$RESULT
-          # done
+            確認です。
+            "`
+            echo ::set-output name=url::$RESULT
+          done
 
       # メッセージを作成する
       - name: create message
