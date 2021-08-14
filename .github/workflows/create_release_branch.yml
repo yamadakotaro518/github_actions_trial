@@ -45,7 +45,7 @@ jobs:
         env:
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
           URLS: ${{ steps.create_pull_request.outputs.urls }}
-        if: ${{ env.URLS[0] != '' }}
+        # if: ${{ env.URLS[0] != '' }}
         run: |
           echo ${URLS[@]}
           MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
@@ -56,7 +56,7 @@ jobs:
         uses: novoda/github-slack-action@master
         env:
           MESSAGE: ${{ steps.create_message.outputs.message }}
-        if: ${{ env.MESSAGE != '' }}
+        # if: ${{ env.MESSAGE != '' }}
         with:
           color: good
           text: ${{ steps.create_message.outputs.message }}
