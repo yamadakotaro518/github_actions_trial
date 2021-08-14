@@ -49,16 +49,17 @@ jobs:
           PULL_REQUEST_CREATED: ${{ steps.create_pull_request.outputs.pull_request_created }}
         if: ${{ env.PULL_REQUEST_CREATED == 'true' }}
         run: |
-          echo ${URLS[@]}
           MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
           echo ::set-output name=message::$MESSAGE
+          echo ::set-output name=pull_request_created::'true'
 
       # slackに通知
       - name: Post to slack
         uses: novoda/github-slack-action@master
         env:
           MESSAGE: ${{ steps.create_message.outputs.message }}
-        # if: ${{ env.MESSAGE != '' }}
+          PULL_REQUEST_CREATED: ${{ steps.create_pull_request.outputs.pull_request_created }}
+        if: ${{ env.PULL_REQUEST_CREATED == 'true' }}
         with:
           color: good
           text: ${{ steps.create_message.outputs.message }}
