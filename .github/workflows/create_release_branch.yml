@@ -20,6 +20,7 @@ jobs:
           TZ: 'Asia/Tokyo'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo `git branch -l`
           DATE=`date +"%Y%m%d_%H%M"`
           BRANCH_NAME="new-branch-$DATE"
           git checkout -b "$BRANCH_NAME"
@@ -36,7 +37,7 @@ jobs:
           RES=`git branch`
           echo $RES
           echo hogehoge
-          
+
           # for BRANCH_FOR_PULL_REQUEST in `git branch | grep "master"`; do
           #   echo "$BRANCH_FOR_PULL_REQUEST"
           #   RESULT=`hub pull-request -b $BRANCH_FOR_PULL_REQUEST -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
