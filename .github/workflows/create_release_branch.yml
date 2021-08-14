@@ -22,12 +22,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
-          for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "sonnnaburanchinaiyo"`; do
+          for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "kakunin"`; do
 
             # マージ用ブランチを作成
             DATE=`date +"%Y%m%d_%H%M%S"`
+            git switch develop
             BRANCH_NAME="new-branch-$DATE"
-            git checkout -b "$BRANCH_NAME"
+            git switch -c "$BRANCH_NAME"
             git push origin "$BRANCH_NAME"
             
             # プルリクエスト作成
@@ -46,7 +47,6 @@ jobs:
         env:
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
           URLS: ${{ steps.create_pull_request.outputs.urls }}
-          # PULL_REQUEST_CREATED: ${{ steps.create_pull_request.outputs.pull_request_created }}
         if: ${{ steps.create_pull_request.outputs.pull_request_created == 'true' }}
         run: |
           MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
@@ -58,7 +58,6 @@ jobs:
         uses: novoda/github-slack-action@master
         env:
           MESSAGE: ${{ steps.create_message.outputs.message }}
-          # PULL_REQUEST_CREATED: ${{ steps.create_pull_request.outputs.pull_request_created }}
         if: ${{ steps.create_pull_request.outputs.pull_request_created == 'true' }}
         with:
           color: good
