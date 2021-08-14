@@ -33,8 +33,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
+          RES=`git branch`
+          echo $RES
           echo hogehoge
-          echo `git branch`
+          
           # for BRANCH_FOR_PULL_REQUEST in `git branch | grep "master"`; do
           #   echo "$BRANCH_FOR_PULL_REQUEST"
           #   RESULT=`hub pull-request -b $BRANCH_FOR_PULL_REQUEST -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
