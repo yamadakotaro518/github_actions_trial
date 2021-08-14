@@ -34,22 +34,22 @@ jobs:
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
         for BRANCH_FOR_PULL_REQUEST in `git branch | grep "master"`; do
-          RESULT=`hub pull-request -b $BRANCH_FOR_PULL_REQUEST -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
+          RESULTS+=(`hub pull-request -b $BRANCH_FOR_PULL_REQUEST -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
           developブランチ取り込み作業
 
           確認です。
-          "`
-          echo ::set-output name=url::$RESULT
+          "`)
         done
+        echo ::set-output name=urls::${RESULTS[@]}
 
       # メッセージを作成する
       - name: create message
         id: create_message
         env:
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
-          URL: ${{ steps.create_pull_request.outputs.url }}
+          URLS: ${{ steps.create_pull_request.outputs.urls }}
         run: |
-          MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました $URL"
+          MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
           echo ::set-output name=message::$MESSAGE
 
       - name: Post to slack
