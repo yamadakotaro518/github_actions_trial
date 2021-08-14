@@ -41,11 +41,11 @@ jobs:
 
       # メッセージを作成する
       - name: create message
-        if: ${{ steps.create_pull_request.outputs.urls[0] != "" }}
         id: create_message
         env:
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
           URLS: ${{ steps.create_pull_request.outputs.urls }}
+        if: ${{ env.URLS[0] != '' }}
         run: |
           echo ${URLS[@]}
           MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
@@ -53,8 +53,10 @@ jobs:
 
       # slackに通知
       - name: Post to slack
-        if: ${{ steps.create_message.outputs.message != "" }}
         uses: novoda/github-slack-action@master
+        env:
+          MESSAGE: ${{ steps.create_message.outputs.message }}
+        if: ${{ env.MESSAGE != '' }}
         with:
           color: good
           text: ${{ steps.create_message.outputs.message }}
