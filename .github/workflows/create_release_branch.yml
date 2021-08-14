@@ -14,26 +14,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create new Branch
-        id: create_branch
-        env:
-          TZ: 'Asia/Tokyo'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          DATE=`date +"%Y%m%d_%H%M"`
-          BRANCH_NAME="new-branch-$DATE"
-          git checkout -b "$BRANCH_NAME"
-          git push origin "$BRANCH_NAME"
-          echo ::set-output name=branch_name::$BRANCH_NAME
-        
       - name: Create Pull Request
         id: create_pull_request
         env:
+          TZ: 'Asia/Tokyo'
           REVIEWERS: "yamadakotaro518"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
         run: |
           for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "kakunin"`; do
+
+            # マージ用ブランチを作成
+            DATE=`date +"%Y%m%d_%H%M"`
+            BRANCH_NAME="new-branch-$DATE"
+            git checkout -b "$BRANCH_NAME"
+            git push origin "$BRANCH_NAME"
+            
+            # プルリクエスト作成
             RESULTS+=(`hub pull-request -b ${BRANCH_FOR_PULL_REQUEST#origin/} -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
             developブランチ取り込み作業
 
@@ -50,7 +47,7 @@ jobs:
           URLS: ${{ steps.create_pull_request.outputs.urls }}
         run: |
           echo ${URLS[@]}
-          MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました $URL"
+          MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
           echo ::set-output name=message::$MESSAGE
 
       - name: Post to slack
