@@ -49,7 +49,7 @@ jobs:
           URLS: ${{ steps.create_pull_request.outputs.urls }}
         if: ${{ steps.create_pull_request.outputs.pull_request_created == 'true' }}
         run: |
-          MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
+          MESSAGE="hogehoge ブランチを作成してプルリクを出しました ${URLS[@]}"
           echo ::set-output name=message::$MESSAGE
           echo ::set-output name=pull_request_created::'true'
 
@@ -62,4 +62,5 @@ jobs:
         with:
           color: good
           text: ${{ steps.create_message.outputs.message }}
-          webhook: ${{ secrets.SLACK_WEBHOOK }} 
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          mentionPairs: hogehoge::USA44RXT7
