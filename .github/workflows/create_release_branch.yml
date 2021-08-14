@@ -20,7 +20,7 @@ jobs:
           TZ: 'Asia/Tokyo'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo `git branch -l`
+          echo `git branch -r`
           git checkout master
           echo "現在のブランチは："
           echo `git branch --contains`
