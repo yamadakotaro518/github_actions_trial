@@ -12,7 +12,7 @@ jobs:
       - name: checkout marge branch
         uses: actions/checkout@v2
         with:
-          ref: develop
+          fetch-depth: 0
 
       - name: Create new Branch
         id: create_branch
@@ -21,9 +21,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo `git branch -r`
-          git checkout master
-          echo "現在のブランチは："
-          echo `git branch --contains`
+          git checkout develop
           DATE=`date +"%Y%m%d_%H%M"`
           BRANCH_NAME="new-branch-$DATE"
           git checkout -b "$BRANCH_NAME"
