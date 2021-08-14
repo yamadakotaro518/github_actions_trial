@@ -62,5 +62,4 @@ jobs:
         with:
           color: good
           text: ${{ steps.create_message.outputs.message }}
-          webhook: ${{ secrets.SLACK_WEBHOOK }}
-          mentionPairs: yamadakotaro518::USA44RXT7
+          webhook: ${{ secrets.SLACK_WEBHOOK }} 
