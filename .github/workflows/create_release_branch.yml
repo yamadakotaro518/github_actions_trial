@@ -41,6 +41,7 @@ jobs:
 
       # メッセージを作成する
       - name: create message
+        if: ${{ ${#steps.create_pull_request.outputs.urls[*]} -ne 0 }}
         id: create_message
         env:
           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
@@ -50,7 +51,9 @@ jobs:
           MESSAGE="$BRANCH_NAME ブランチを作成してプルリクを出しました ${URLS[@]}"
           echo ::set-output name=message::$MESSAGE
 
+      # slackに通知
       - name: Post to slack
+        if: ${{ -n steps.create_message.outputs.message }}
         uses: novoda/github-slack-action@master
         with:
           color: good
