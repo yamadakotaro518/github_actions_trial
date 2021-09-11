@@ -1,0 +1,39 @@
+name: create new branch
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+    types: [ closed ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # メッセージを作成する
+      - name: create message
+        id: create_message
+        env:
+          USER: ${{ github.event.pull_request.user }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        if: ${{ github.event.pull_request.merged == true }}
+        run: |
+          MESSAGE="<@USA44RXT7>  
+          ユーザーは ${USER}
+          PRのURLは ${PR_URL}
+          PRのタイトルは ${PR_TITLE}
+          "
+          echo ::set-output name=message::$MESSAGE
+
+      # slackに通知
+      - name: Post to slack
+        uses: novoda/github-slack-action@master
+        env:
+          MESSAGE: ${{ steps.create_message.outputs.message }}
+        with:
+          color: good
+          text: ${{ steps.create_message.outputs.message }}
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
