@@ -19,11 +19,13 @@ jobs:
           USER: ${{ github.event.pull_request.user.login }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_TITLE: ${{ github.event.pull_request.title }}
+          CONTENTS_URL: ${{ github.event.pull_request.base.repo.contents_url }}
         if: ${{ github.event.pull_request.merged == true }}
         run: |
           MESSAGE="<@USA44RXT7> \n  
           ${USER} さんがPRをマージしました。ご確認ください。 \n
           <${PR_URL}|${PR_TITLE}> \n
+          contents_urlは ${CONTENTS_URL}
           "
           echo ::set-output name=message::$MESSAGE
 
