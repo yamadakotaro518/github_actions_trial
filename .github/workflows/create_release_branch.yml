@@ -1,65 +1,65 @@
-name: create new branch
+# name: create new branch
 
-on:
-  push:
-    branches: [ develop ]
+# on:
+#   push:
+#     branches: [ develop ]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: checkout marge branch
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+#     steps:
+#       - name: checkout marge branch
+#         uses: actions/checkout@v2
+#         with:
+#           fetch-depth: 0
 
-      - name: Create Pull Request
-        id: create_pull_request
-        env:
-          TZ: 'Asia/Tokyo'
-          REVIEWERS: "yamadakotaro518"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
-        run: |
-          for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "kakunin"`; do
+#       - name: Create Pull Request
+#         id: create_pull_request
+#         env:
+#           TZ: 'Asia/Tokyo'
+#           REVIEWERS: "yamadakotaro518"
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
+#         run: |
+#           for BRANCH_FOR_PULL_REQUEST in `git branch -r | grep "kakunin"`; do
 
-            # マージ用ブランチを作成
-            DATE=`date +"%Y%m%d_%H%M%S"`
-            git switch develop
-            BRANCH_NAME="new-branch-$DATE"
-            git switch -c "$BRANCH_NAME"
-            git push origin "$BRANCH_NAME"
+#             # マージ用ブランチを作成
+#             DATE=`date +"%Y%m%d_%H%M%S"`
+#             git switch develop
+#             BRANCH_NAME="new-branch-$DATE"
+#             git switch -c "$BRANCH_NAME"
+#             git push origin "$BRANCH_NAME"
             
-            # プルリクエスト作成
-            RESULTS+=(`hub pull-request -b ${BRANCH_FOR_PULL_REQUEST#origin/} -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
-            developブランチ取り込み作業
+#             # プルリクエスト作成
+#             RESULTS+=(`hub pull-request -b ${BRANCH_FOR_PULL_REQUEST#origin/} -h $BRANCH_NAME -r $REVIEWERS -F-<<<"
+#             developブランチ取り込み作業
 
-            確認です。
-            "`)
-            echo ::set-output name=urls::${RESULTS[@]}
-            echo ::set-output name=pull_request_created::'true'
-          done
+#             確認です。
+#             "`)
+#             echo ::set-output name=urls::${RESULTS[@]}
+#             echo ::set-output name=pull_request_created::'true'
+#           done
 
-      # メッセージを作成する
-      - name: create message
-        id: create_message
-        env:
-          BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
-          URLS: ${{ steps.create_pull_request.outputs.urls }}
-        if: ${{ steps.create_pull_request.outputs.pull_request_created == 'true' }}
-        run: |
-          MESSAGE="<@USA44RXT7>  hogehoge ブランチを作成してプルリクを出しました ${URLS[@]}"
-          echo ::set-output name=message::$MESSAGE
-          echo ::set-output name=pull_request_created::'true'
+#       # メッセージを作成する
+#       - name: create message
+#         id: create_message
+#         env:
+#           BRANCH_NAME: ${{ steps.create_branch.outputs.branch_name }}
+#           URLS: ${{ steps.create_pull_request.outputs.urls }}
+#         if: ${{ steps.create_pull_request.outputs.pull_request_created == 'true' }}
+#         run: |
+#           MESSAGE="<@USA44RXT7>  hogehoge ブランチを作成してプルリクを出しました ${URLS[@]}"
+#           echo ::set-output name=message::$MESSAGE
+#           echo ::set-output name=pull_request_created::'true'
 
-      # slackに通知
-      - name: Post to slack
-        uses: novoda/github-slack-action@master
-        env:
-          MESSAGE: ${{ steps.create_message.outputs.message }}
-        if: ${{ steps.create_pull_request.outputs.pull_request_created == 'true' }}
-        with:
-          color: good
-          text: ${{ steps.create_message.outputs.message }}
-          webhook: ${{ secrets.SLACK_WEBHOOK }}
+#       # slackに通知
+#       - name: Post to slack
+#         uses: novoda/github-slack-action@master
+#         env:
+#           MESSAGE: ${{ steps.create_message.outputs.message }}
+#         if: ${{ steps.create_pull_request.outputs.pull_request_created == 'true' }}
+#         with:
+#           color: good
+#           text: ${{ steps.create_message.outputs.message }}
+#           webhook: ${{ secrets.SLACK_WEBHOOK }}
