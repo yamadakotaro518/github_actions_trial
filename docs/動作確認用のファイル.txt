@@ -1,1 +1,2 @@
 github actionが動くか確認。。。
+github actionを動かしたい
