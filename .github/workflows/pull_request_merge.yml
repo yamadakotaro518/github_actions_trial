@@ -1,8 +1,6 @@
 name: create new branch
 
 on:
-  push:
-    branches: [ develop ]
   pull_request:
     branches: [ develop ]
     types: [ closed ]
@@ -22,9 +20,7 @@ jobs:
         if: ${{ github.event.pull_request.merged == true }}
         run: |
           MESSAGE="<@USA44RXT7> \n  
-          ユーザーは ${USER} \n
-          PRのURLは ${PR_URL} \n
-          PRのタイトルは ${PR_TITLE} \n
+          ${USER} さんがPRをマージしました。ご確認ください。 \n
           <${PR_URL}|${PR_TITLE}> \n
           "
           echo ::set-output name=message::$MESSAGE
