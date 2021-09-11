@@ -21,10 +21,11 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         if: ${{ github.event.pull_request.merged == true }}
         run: |
-          MESSAGE="<@USA44RXT7>  
-          ユーザーは ${USER}
-          PRのURLは ${PR_URL}
-          PRのタイトルは ${PR_TITLE}
+          MESSAGE="<@USA44RXT7> \n  
+          ユーザーは ${USER} \n
+          PRのURLは ${PR_URL} \n
+          PRのタイトルは ${PR_TITLE} \n
+          <${PR_URL}|${PR_TITLE}> \n
           "
           echo ::set-output name=message::$MESSAGE
 
