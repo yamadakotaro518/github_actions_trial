@@ -12,6 +12,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: checkout marge branch
+        uses: actions/checkout@v2
+        # with:
+        #   fetch-depth: 0
+        run: |
+          git diff HEAD^..HEAD --name-only
+
       # メッセージを作成する
       - name: create message
         id: create_message
