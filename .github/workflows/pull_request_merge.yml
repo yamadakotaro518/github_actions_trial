@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: [ develop ]
     types: [ closed ]
-    # paths:
-    #   - 'docs/*'
+    paths:
+      - 'docs/*'
 
 jobs:
   build:
@@ -14,12 +14,8 @@ jobs:
     steps:
       - name: checkout marge branch
         uses: actions/checkout@v2
-        # with:
-        #   fetch-depth: 0
-
-      - name: git diff  
-        run: |
-          git diff HEAD^..HEAD --name-only
+        with:
+          fetch-depth: 0
 
       # メッセージを作成する
       - name: create message
@@ -28,13 +24,18 @@ jobs:
           USER: ${{ github.event.pull_request.user.login }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_TITLE: ${{ github.event.pull_request.title }}
-          CONTENTS_URL: ${{ github.event.pull_request.base.repo.contents_url }}
         if: ${{ github.event.pull_request.merged == true }}
         run: |
+          for DOCUMENT_FILE_PATH in `git diff HEAD^..HEAD --name-only`; do
+            FILE_NAME=`head -n 1 ${DOCUMENT_FILE_PATH}`
+            LINKS+=("${FILE_NAME}\n")
+          done
+
           MESSAGE="<@USA44RXT7> \n  
           ${USER} さんがPRをマージしました。ご確認ください。 \n
           <${PR_URL}|${PR_TITLE}> \n
-          contents_urlは ${CONTENTS_URL}
+          変更されたファイルは以下です。\n
+          ${LINKS[@]}\n
           "
           echo ::set-output name=message::$MESSAGE
 
