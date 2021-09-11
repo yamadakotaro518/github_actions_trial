@@ -16,7 +16,7 @@ jobs:
       - name: create message
         id: create_message
         env:
-          USER: ${{ github.event.pull_request.user }}
+          USER: ${{ github.event.pull_request.user.login }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_TITLE: ${{ github.event.pull_request.title }}
         if: ${{ github.event.pull_request.merged == true }}
