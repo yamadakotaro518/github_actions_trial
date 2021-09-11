@@ -28,7 +28,11 @@ jobs:
         run: |
           for DOCUMENT_FILE_PATH in `git diff HEAD^..HEAD --name-only`; do
             FILE_NAME=`head -n 1 ${DOCUMENT_FILE_PATH}`
-            LINKS+=("${FILE_NAME}\n")
+            if [ ${FILE_NAME:0:1} = "#" ]; then
+              DOCUMENT_FILE_BASENAME=${DOCUMENT_FILE_PATH##*/}
+              DOCUMENT_LINK="https://presus-docs.s3-ap-northeast-1.amazonaws.com/guideline/docs/${DOCUMENT_FILE_BASENAME//md/html}"
+              LINKS+=("<${FILE_NAME//# /}|${DOCUMENT_LINK}> \n")
+            fi
           done
 
           MESSAGE="<@USA44RXT7> \n  
@@ -45,6 +49,5 @@ jobs:
         env:
           MESSAGE: ${{ steps.create_message.outputs.message }}
         with:
-          color: good
           text: ${{ steps.create_message.outputs.message }}
           webhook: ${{ secrets.SLACK_WEBHOOK }}
