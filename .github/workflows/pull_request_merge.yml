@@ -18,10 +18,12 @@ jobs:
           fetch-depth: 0
       
       - name: thread sleep for waiting deploy
-        script: |
-          setTimeout(function(){
-            console.log("20秒待ちました")
-          }, 20000)
+        uses: actions/github-script@v3
+        with:
+          script: |
+            setTimeout(function(){
+              console.log("20秒待ちました")
+            }, 20000)
 
       # メッセージを作成する
       - name: create message
