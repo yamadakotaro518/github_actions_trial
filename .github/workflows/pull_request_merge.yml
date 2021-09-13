@@ -16,6 +16,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      
+      - name: thread sleep for waiting deploy
+        script: |
+          setTimeout(function(){
+            console.log("20秒待ちました")
+          }, 20000)
 
       # メッセージを作成する
       - name: create message
@@ -26,9 +32,17 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         if: ${{ github.event.pull_request.merged == true }}
         run: |
+          # 差分があったガイドラインのページを一覧化する
+          # 差分があったファイルごとにループ
           for DOCUMENT_FILE_PATH in `git diff HEAD^..HEAD --name-only`; do
+
+            # ファイルの1行目にファイルのタイトルがあるので取得
             FILE_NAME=`head -n 1 ${DOCUMENT_FILE_PATH}`
+
+            # ガイドラインのファイル以外の差分が紛れてるかもなので、ファイルの1行目が#から始まるか確認
             if [ ${FILE_NAME:0:1} = "#" ]; then
+
+              # 差分があったガイドラインのページ名をリンク化する
               DOCUMENT_FILE_BASENAME=${DOCUMENT_FILE_PATH##*/}
               DOCUMENT_URL="https://presus-docs.s3-ap-northeast-1.amazonaws.com/guideline/docs/${DOCUMENT_FILE_BASENAME//md/html}"
               LINKS+=("<${DOCUMENT_URL}|${FILE_NAME//# /}> \n")
@@ -36,10 +50,11 @@ jobs:
           done
 
           MESSAGE="<@USA44RXT7> \n  
-          ${USER} さんがPRをマージしました。ご確認ください。 \n
-          <${PR_URL}|${PR_TITLE}> \n
-          変更されたファイルは以下です。\n
+          ${USER} さんが開発ガイドラインを更新しました。更新があったページは以下です。 \n
           ${LINKS[@]}\n
+
+          変更の詳細は下記PRをご確認ください。\n
+          <${PR_URL}|${PR_TITLE}> \n
           "
           echo ::set-output name=message::$MESSAGE
 
