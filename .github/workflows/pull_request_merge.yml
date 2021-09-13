@@ -16,6 +16,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      
+      - name: thread sleep for waiting deploy
+        script: |
+          setTimeout(function(){
+            console.log("20秒待ちました")
+          }, 20000)
 
       # メッセージを作成する
       - name: create message
