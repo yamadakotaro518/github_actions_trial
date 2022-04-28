@@ -1,0 +1,51 @@
+#aaaaaa
+on:
+  workflow_call:
+    inputs:
+      reviewers:
+        required: true
+        type: string
+      branch_from:
+        required: true
+        type: string
+      branch_to:
+        required: true
+        type: string
+name: generate merge pull request
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: checkout master branch
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # マージ用プルリク作成
+      - name: Create Pull Request
+        id: create_pull_request
+        env:
+          TZ: 'Asia/Tokyo'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USER: ${{ github.event.pull_request.user.login }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        if: ${{ github.event.pull_request.merged == true }}
+        run: |
+          # マージ用ブランチを作成
+          DATE=`date +"%Y%m%d_%H%M%S"`
+          BRANCH_NAME_FOR_MERGE="${{ inputs.branch_from }}_branch_merge_to_${{ inputs.branch_to }}_$DATE"
+          git switch ${{ inputs.branch_from }}
+          git switch -c "$BRANCH_NAME_FOR_MERGE"
+          git push origin "$BRANCH_NAME_FOR_MERGE"
+          # プルリクエスト作成
+          hub pull-request -b ${{ inputs.branch_to }} -h $BRANCH_NAME_FOR_MERGE -r ${{ inputs.reviewers }} -F-<<<"
+          ${{ inputs.branch_from }}ブランチ取り込み ${{ inputs.branch_to }}ブランチ向け
+
+          ${{ inputs.branch_from }}ブランチに以下のPRがマージされました。
+          [${PR_TITLE}](${PR_URL}) by ${{ inputs.reviewers }}
+          差分内容を確認のうえ、問題なければマージしてください。
+          コンフリクトがある場合は解消をお願いします。
+          "
