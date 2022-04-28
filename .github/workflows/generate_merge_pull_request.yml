@@ -43,7 +43,7 @@ jobs:
           hub pull-request -b ${{ inputs.branch_to }} -h $BRANCH_NAME_FOR_MERGE -r ${{ inputs.reviewers }} -F-<<<"
           ${{ inputs.branch_from }}ブランチ取り込み ${{ inputs.branch_to }}ブランチ向け
 
-          ${{ inputs.branch_from }ブランチに以下のPRがマージされました。
+          ${{ inputs.branch_from }}ブランチに以下のPRがマージされました。
           [${PR_TITLE}](${PR_URL}) by ${{ inputs.reviewers }}
           差分内容を確認のうえ、問題なければマージしてください。
           コンフリクトがある場合は解消をお願いします。
