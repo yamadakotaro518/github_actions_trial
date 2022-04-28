@@ -1,0 +1,15 @@
+name: generate merge pr of develop to hoge
+
+on:
+  pull_request:
+    branches: [ develop ]
+    types: [ closed ]
+
+jobs:
+  build: 
+    uses: yamadakotaro518/github_actions_trial/.github/workflows/generate_merge_pull_request.yml@develop
+    with:
+      reviewers: "yamadakotaro518"
+      branch_from: develop
+      branch_to: feature/hoge
+
