@@ -1,0 +1,62 @@
+on:
+  pull_request:
+    types: [ opened ]
+    paths:
+      - 'sql/createTable/*'
+jobs:
+  warn:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout branch
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: judge check sql created
+        id: judge_check_sql_created
+        run: |
+          UPDATE_OR_INSERT_SQL_EXISTS=false # UPDATEかINSERTをするSQLが存在するか
+
+          #createTableもしくはinsertData配下に追加されたSQLに、updateかinsertの単語が含まれているか確認
+          for MODIFIED_SQL_FILE_PATH in $(git diff HEAD^..HEAD --name-only | grep -e createTable -e insertData ) ; do
+            if [ $(git diff ${{github.base_ref}} ${{github.head_ref}} $MODIFIED_SQL_FILE_PATH | grep + | grep -i -e update -e insert | wc -l) -gt 0 ]; then
+              UPDATE_OR_INSERT_SQL_EXISTS=true
+            fi
+          done
+
+          # 単純なテーブル定義のSQLファイルしかない場合は処理終了
+          if [ UPDATE_OR_INSERT_SQL_EXISTS = "false" ]; then
+            return 0
+          fi
+
+          # 差分があったファイルの中に、checkフォルダ配下のファイルが1つもなかったらフラグにtrueをセット
+          CHECK_SQL_NOT_CREATED=true
+          for MODIFIED_FILE_PAFH in $(git diff HEAD^..HEAD --name-only) ; do
+            # 「check」ディレクトリ配下のファイルである = データ確認用のSQLがあるか確認
+            if [ $(basename $(dirname "$MODIFIED_FILE_PAFH")) = "check" ]; then
+              CHECK_SQL_NOT_CREATED=false
+            fi
+          done
+
+          echo ::set-output name=check_sql_not_created::${CHECK_SQL_NOT_CREATED}
+
+      - name: comment warn message
+        uses: actions/github-script@v3
+        env:
+          CHECK_SQL_NOT_CREATED: ${{ steps.judge_check_sql_created.outputs.check_sql_not_created }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            if(process.env.CHECK_SQL_NOT_CREATED === 'false'){
+              return;
+            }
+
+            await github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `INSERTまたはUPDATEをするSQLが追加されましたが、データ確認用SQLが作成されていません。
+                [こちら](https://presus-docs.s3-ap-northeast-1.amazonaws.com/guideline/index.html#/pages/Migration?id=%e3%83%9e%e3%82%a4%e3%82%b0%e3%83%ac%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e3%83%95%e3%82%a1%e3%82%a4%e3%83%ab%e4%bd%9c%e6%88%90%e3%81%ab%e4%bb%98%e9%9a%8f%e3%81%99%e3%82%8b%e3%82%bf%e3%82%b9%e3%82%af%e3%81%ab%e3%81%a4%e3%81%84%e3%81%a6)を参考にデータ確認用SQLの作成をお願いします。
+              `.replace(/\n +/g, '\n')
+            })
